@@ -29,6 +29,13 @@ El EDA es una parte fundamental de este proyecto. Los cuadernos en la carpeta `n
 
 El modelo predictivo se ha desarrollado utilizando el algoritmo de Regresión Logística. Se encuentra en la carpeta `models/`.
 
+## Carga de archivos
+
+Descargar los archivos de estos enlases y guardarlos en la carpeta src/data/raw
+
+train_csv = "https://drive.google.com/file/d/1g83df0592R1u7biEdZXnEu2_pBcqbP4r/view?usp=share_link"
+test_csv = "https://drive.google.com/file/d/1XtBRQVTBVII8_kUma1Xj8vldD5hAlK83/view?usp=share_link"
+
 
 ## Contribuciones
 
