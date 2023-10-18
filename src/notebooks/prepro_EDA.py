@@ -11,7 +11,6 @@ sys.path.append("C:/Users/Hp/Desktop/proyecto")
 from src.utils.functions import cargar_y_preprocesar_datos, escalar_y_codificar
 
 
-
 train_csv = 'src/data/raw/customer_churn_dataset-training-master.csv'
 test_csv = 'src/data/raw/customer_churn_dataset-testing-master.csv'
 
@@ -34,7 +33,7 @@ variables_categoricas = ['Gender', 'Subscription Type', 'Contract Length']
 # estadístico de variables numéricas
 estadisticos_num = df_concatenado.drop(columns="Churn").describe().T
 estadisticos_num
-"""
+
 # Visualización de Distribuciones
 for variable in variables_numericas:
     plt.figure(figsize=(8, 4))
@@ -61,7 +60,7 @@ for variable in variables_categoricas:
     plt.ylabel('Frecuencia')
     plt.show()
 
-"""
+
 #Age: La edad promedio es de aproximadamente 39 años, con una distribución que va desde 18 hasta 65 años. 
 
 #Tenure: La tenencia promedio es de aproximadamente 31 meses, con valores que van desde 1 hasta 60 meses.
@@ -85,7 +84,7 @@ for variable in variables_categoricas:
 
 # ANALISIS BIVARIANTE
 
-"""
+
 # Relacion entre variables numericas y target
 for variable in variables_numericas:
     plt.figure(figsize=(8, 4))
@@ -103,7 +102,6 @@ for variable in variables_numericas:
     plt.ylabel(variable)
     plt.show()
 
-"""
 
 # La variable Age tiene indicencia en el target. El promedio de edad de los que dejan la empresa es mayor a los que no
 
@@ -120,7 +118,7 @@ for variable in variables_numericas:
 # Por ultimo observamos que los clientes que se van de la empresa en promedio, hace mas tiempo que no realizan transacciones.
 
 ##################
-"""
+
 # Relacion entre variables categóticas y target (churn)
 for variable in variables_categoricas:
     plt.figure(figsize=(8, 5))
@@ -130,7 +128,8 @@ for variable in variables_categoricas:
     plt.ylabel('Frecuencia')
     plt.legend(title='Churn', loc='upper right', labels=['No Churn', 'Churn'])
     plt.show()
-"""
+
+
 # tabla variables categóricas y Churn
 for variable in variables_categoricas:
     tabla_frecuencia = pd.crosstab(index=df_concatenado[variable], columns=df_concatenado['Churn'], normalize='index')
@@ -148,7 +147,7 @@ for variable in variables_categoricas:
 
  # ANALISIS MULTIVARIANTE
 
-"""
+
 # Grafico boxplot de variables cat y num dividos por churn
 for variable_cat in variables_categoricas:
     for variable_num in variables_numericas:
@@ -160,7 +159,7 @@ for variable_cat in variables_categoricas:
         plt.legend(title='Churn', loc='upper right', labels=['No Churn', 'Churn'])
         plt.xticks(rotation=45)
         plt.show()
-"""
+
 df_churn_0 = df_concatenado[df_concatenado['Churn'] == 0]
 df_churn_1 = df_concatenado[df_concatenado['Churn'] == 1]
 
