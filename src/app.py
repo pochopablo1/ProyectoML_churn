@@ -28,7 +28,7 @@ def escalar_y_codificar(df):
 
 
 def cargar_y_predecir_modelo(nuevos_datos):
-    modelo_pkl = "C:/Users/Hp/Desktop/proyecto/src/models/modelo_lr_mejor.pkl"
+    modelo_pkl = "C:/Users/Hp/Desktop/ProyectoML_churn/src/models/modelo_lr_mejor.pkl"
     
     # modelo previamente entrenado desde el archivo .pkl
     modelo = joblib.load(modelo_pkl)
