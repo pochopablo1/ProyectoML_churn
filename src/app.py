@@ -5,7 +5,7 @@ import os
 import sys
 import seaborn as sns
 
-sys.path.append("C:/Users/Hp/Desktop/proyecto")
+sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
 
 from src.utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
 

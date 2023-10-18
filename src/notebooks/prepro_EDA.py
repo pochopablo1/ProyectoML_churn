@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
-sys.path.append("C:/Users/Hp/Desktop/proyecto")
+sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
 
 
 from src.utils.functions import cargar_y_preprocesar_datos, escalar_y_codificar
