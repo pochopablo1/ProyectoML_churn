@@ -4,10 +4,49 @@ import pandas as pd
 import os
 import sys
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
-sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
+def escalar_y_codificar(df):
+    # Aplica get_dummies a las variables categóricas
+    dummies = pd.get_dummies(df[["Gender", 'Subscription Type']], drop_first=True)
+    df = pd.concat([df, dummies], axis=1)
+    df = df.drop(["Gender", 'Subscription Type'], axis=1)
 
-from src.utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
+    # Codifica la variable Contract Length
+    df['Contract Length_cod'] = df['Contract Length'].apply(lambda x: 1 if x in ('Annual', 'Quarterly') else 0)
+
+    # Selecciona las columnas numéricas para escalar
+    variables_scaler = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
+
+    # Crea un objeto MinMaxScaler
+    scaler = MinMaxScaler()
+
+    # Aplica la estandarización a las columnas numéricas seleccionadas
+    df[variables_scaler] = scaler.fit_transform(df[variables_scaler])
+
+    return df
+
+
+def cargar_y_predecir_modelo(nuevos_datos):
+    modelo_pkl = "C:/Users/Hp/Desktop/proyecto/src/models/modelo_lr_mejor.pkl"
+    
+    # modelo previamente entrenado desde el archivo .pkl
+    modelo = joblib.load(modelo_pkl)
+
+    # predicciones en los nuevos datos
+    predicciones = modelo.predict(nuevos_datos)
+
+    # probabilidades de las predicciones (0 y 1)
+    probabilidades = modelo.predict_proba(nuevos_datos)
+
+    importancias = modelo.coef_[0]
+
+    # predicciones + probabilidades
+    return predicciones, probabilidades , importancias
+
+
+
+
 
 # Título de la aplicación
 st.title('Predicción de Churn')
