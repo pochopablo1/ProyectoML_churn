@@ -71,8 +71,9 @@ def preparar_datos(df):
 
 
 def cargar_y_predecir_modelo(nuevos_datos):
-    modelo_pkl = "C:/Users/Hp/Desktop/ProyectoML_churn/src/models/modelo_lr_mejor.pkl"
     
+    modelo_pkl = "src/models/modelo_lr_mejor.pkl" 
+
     # modelo previamente entrenado desde el archivo .pkl
     modelo = joblib.load(modelo_pkl)
 
