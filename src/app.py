@@ -7,20 +7,22 @@ import sys
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 
+sys.path.append("C:/Users/Hp/Desktop/proyecto")
+
+
 from src.utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
 
 import streamlit as st
 
 # Título de la aplicación
-st.title('Presentación en Streamlit')
+st.title('Presentación caso de negocio')
 
-# Menú lateral
+# menu lateral
 st.sidebar.title('Menú')
 seccion = st.sidebar.radio('Ir a sección:', ('Introducción', 'Análisis EDA', 'Entrenamiento Modelo', 'Predicción'))
 
 # Contenido de la sección
 if seccion == 'Introducción':
-    st.write('Bienvenido a la sección de Introducción.')
     st.write('Bienvenidos a la plataforma de análisis y predicción de Churn de la empresa TelecomConnect. '
          'TelecomConnect es un proveedor líder de servicios de telecomunicaciones que se enfrenta al desafío de retener a sus clientes en un mercado competitivo. '
          'La retención de clientes es esencial para el éxito a largo plazo de TelecomConnect. Para abordar este desafío que nos solicitaron, utilizaremos datos para analizar patrones y '
@@ -29,7 +31,9 @@ if seccion == 'Introducción':
 
 elif seccion == 'Análisis EDA':
     st.write('Bienvenido a la sección de Análisis EDA.')
-    # Agrega aquí el contenido de la sección de Análisis EDA
+
+
+
 
 elif seccion == 'Entrenamiento Modelo':
     st.write('Bienvenido a la sección de Entrenamiento del Modelo.')

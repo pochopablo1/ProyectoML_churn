@@ -194,6 +194,7 @@ limite_inferior_TS = Q1_TS - 1.5 * IQR_TS
 # eliminar filas con valores atípicos en Support Calls y Total Spend
 df_concatenado = df_concatenado[~((df_concatenado['Churn'] == 0) & ((df_concatenado['Support Calls'] > limite_superior_SC) | (df_concatenado['Total Spend'] < limite_inferior_TS)))]
 
+
 # Correlaciones entre variables numéricas
 correlacion_matrix = df_concatenado[['Churn','Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Total Spend','Last Interaction','Payment Delay']].corr()
 sns.heatmap(correlacion_matrix, annot=True, cmap='coolwarm')
