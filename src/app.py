@@ -37,7 +37,7 @@ elif seccion == 'Análisis EDA':
     import matplotlib.pyplot as plt
     import seaborn as sns
     import streamlit as st
-    from src.utils.functions import cargar_y_preprocesar_datos
+    from utils.functions import cargar_y_preprocesar_datos
 
     # Agrega la ruta al directorio y carga los datos
     sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
