@@ -51,6 +51,8 @@ def escalar_y_codificar(df):
     return df
 
 
+
+
 def preparar_datos(df):
     # Filtrar el DataFrame para obtener los conjuntos de entrenamiento y prueba
     train_data = df[df["dataset"] == "train"]

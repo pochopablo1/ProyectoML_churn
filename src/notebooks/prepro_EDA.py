@@ -51,13 +51,13 @@ for variable in variables_numericas:
     plt.ylabel(variable)
     plt.show()
 
-# Visualización de la Distribución de Variables Categóricas
+
 for variable in variables_categoricas:
     plt.figure(figsize=(6, 4))
-    sns.countplot(data=df_concatenado, x=variable)
+    counts = df_concatenado[variable].value_counts()
+    labels = counts.index
+    plt.pie(counts, labels=labels)
     plt.title(f'Distribución de {variable}')
-    plt.xlabel(variable)
-    plt.ylabel('Frecuencia')
     plt.show()
 
 
