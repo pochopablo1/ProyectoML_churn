@@ -9,10 +9,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-os.chdir('..')
 st.write(os.getcwd())
 
-from src.utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
+from utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
 
 import streamlit as st
 
