@@ -33,7 +33,7 @@ variables_categoricas = ['Gender', 'Subscription Type', 'Contract Length']
 # estadístico de variables numéricas
 estadisticos_num = df_concatenado.drop(columns="Churn").describe().T
 estadisticos_num
-
+'''
 # Visualización de Distribuciones
 for variable in variables_numericas:
     plt.figure(figsize=(8, 4))
@@ -159,7 +159,7 @@ for variable_cat in variables_categoricas:
         plt.legend(title='Churn', loc='upper right', labels=['No Churn', 'Churn'])
         plt.xticks(rotation=45)
         plt.show()
-
+'''
 df_churn_0 = df_concatenado[df_concatenado['Churn'] == 0]
 df_churn_1 = df_concatenado[df_concatenado['Churn'] == 1]
 

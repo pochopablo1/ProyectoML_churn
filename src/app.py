@@ -1,4 +1,5 @@
 
+import matplotlib.pyplot as plt
 import joblib
 import streamlit as st
 import pandas as pd
@@ -12,8 +13,6 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.write(os.getcwd())
 
 from utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
-
-import streamlit as st
 
 # Título de la aplicación
 st.title('Presentación caso de negocio')
@@ -33,12 +32,7 @@ if seccion == 'Introducción':
 elif seccion == 'Análisis EDA':
     st.write('Bienvenido a la sección de Análisis EDA.')
 
-    import sys
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    import streamlit as st
-    from utils.functions import cargar_y_preprocesar_datos
-
+    
     # Agrega la ruta al directorio y carga los datos
     sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
     train_csv = 'src/data/raw/customer_churn_dataset-training-master.csv'
@@ -142,6 +136,7 @@ elif seccion == 'Análisis EDA':
     st.write('La variable Total Spend también parece tener influencia en nuestros target. Los clientes que más gastan son los que deciden quedarse en la empresa. Encontramos valores atípicos en los clientes que se quedan en la empresa (luego vamos a analizar).')
 
     st.write('Por último, observamos que los clientes que se van de la empresa en promedio, hace más tiempo que no realizan transacciones.')
+
 
     # Relación entre variables categóricas y target (churn)
     for variable in variables_categoricas:
