@@ -380,7 +380,7 @@ elif seccion == 'Predicción':
             st.subheader('Importancia de Características')
             st.pyplot(plt)
 
-            # Agregar espacio entre elementos
+            # Agregar espacios
             st.markdown('<br>', unsafe_allow_html=True)
 
             st.write(
@@ -388,7 +388,7 @@ elif seccion == 'Predicción':
                 unsafe_allow_html=True
             )
 
-            # Agregar espacio entre elementos
+            # Agregar espacios
             st.markdown('<br>', unsafe_allow_html=True)
 
 elif seccion == 'Conclusiones y Recomendaciones':
