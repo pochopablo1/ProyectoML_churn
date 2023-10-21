@@ -297,10 +297,22 @@ elif seccion == 'Entrenamiento Modelo':
         }
     }
 
+
+    
+
     for modelo, datos in resultados.items():
         st.subheader(modelo)
         st.markdown(f"Precisión: {datos['Precisión']:.4f}")
         st.write(f"Informe de clasificación:\n{datos['Informe de clasificación']}")
+
+    st.write("Motivos para elegir la Regresión Logística:")
+    st.write("- Rendimiento Confiable (ROC-AUC: 0.76):")
+    st.write("- AL igual que los demas modelos, predice casi al 0.1 los positivos (clientes que se van)")
+    st.write("- Equilibrio Entre Sensibilidad y Especificidad:")
+    st.write("- Este modelo logra acuraccy de 0.71, un equilibrio efectivo entre detectar clientes que abandonarán y los que no lo harán, lo que es fundamental en un problema de churn.")
+
+
+
 elif seccion == 'Predicción':
     st.write('Bienvenido a la sección de Predicción.')
 
