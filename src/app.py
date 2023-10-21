@@ -206,7 +206,7 @@ elif seccion == 'Análisis EDA':
 
 
     st.write('1. Codificación de Variables Categóricas: Se aplicó la codificación one-hot (get_dummies)'
-              'a las variables categóricas "Gender" y "Subscription Type". Esto se hizo para convertir' 
+              'a la variable categórica "Gender". Esto se hizo para convertir' 
               'las variables categóricas en variables numéricas binarias (0 o 1), lo que es esencial para'
               'que los algoritmos de machine learning las utilicen.')
 
