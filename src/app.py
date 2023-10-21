@@ -85,27 +85,7 @@ elif seccion == 'Análisis EDA':
     st.subheader('Estadísticas de Variables Numéricas:')
     st.write(df_concatenado[variables_numericas].describe())
 
-    # Visualización de Distribuciones para Variables Numéricas
-    st.subheader('Visualización de Distribuciones para Variables Numéricas:')
-    for variable in variables_numericas:
-        plt.figure(figsize=(8, 4))
-        sns.histplot(data=df_concatenado, x=variable)
-        plt.title(f'Distribución de {variable}')
-        plt.xlabel(variable)
-        plt.ylabel('Frecuencia')
-        st.pyplot(plt) 
-        st.write(f'Distribución de {variable}')
-
-    # Visualización de Diagramas de Caja para Variables Numéricas
-    st.subheader('Visualización de Diagramas de Caja para Variables Numéricas:')
-    for variable in variables_numericas:
-        plt.figure(figsize=(8, 4))
-        sns.boxplot(data=df_concatenado, y=variable)
-        plt.title(f'Gráfico de Bigote de {variable}')
-        plt.ylabel(variable)
-        st.pyplot()  
-        st.write(f'Gráfico de Bigote de {variable}')
-
+    
     # Visualización de la Distribución de Variables Categóricas
     st.subheader('Visualización de la Distribución de Variables Categóricas:')
     for variable in variables_categoricas:
