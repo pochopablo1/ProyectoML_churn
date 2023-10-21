@@ -8,32 +8,43 @@ import sys
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-st.write(os.getcwd())
+sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
 
-from utils.functions import escalar_y_codificar, cargar_y_predecir_modelo
+from utils.functions import escalar_y_codificar, cargar_y_predecir_modelo, cargar_y_preprocesar_datos, preparar_datos
 
-# Título de la aplicación
-st.title('Presentación caso de negocio')
+
+
 
 # menu lateral
 st.sidebar.title('Menú')
-seccion = st.sidebar.radio('Ir a sección:', ('Introducción', 'Análisis EDA', 'Entrenamiento Modelo', 'Predicción'))
+seccion = st.sidebar.radio('Ir a sección:', ('Introducción', 'Análisis EDA', 'Entrenamiento Modelo', 'Predicción','Conclusiones y Recomendaciones'))
 
 # Contenido de la sección
 if seccion == 'Introducción':
-    st.write('Bienvenidos a la plataforma de análisis y predicción de Churn de la empresa TelecomConnect. '
-         'TelecomConnect es un proveedor líder de servicios de telecomunicaciones que se enfrenta al desafío de retener a sus clientes en un mercado competitivo. '
-         'La retención de clientes es esencial para el éxito a largo plazo de TelecomConnect. Para abordar este desafío que nos solicitaron, utilizaremos datos para analizar patrones y '
-         'desarrollar un modelo de predicción de Churn, lo que nos permitirá anticiparnos a las bajas de clientes y tomar medidas proactivas. '
-         'Los datos y el análisis desempeñan un papel fundamental en la retención de clientes y en la mejora de la satisfacción del cliente. ')
+
+    st.title('Introduccion')
+    
+    # Información sobre el proyecto
+
+    st.write("-TelecomConnect es un proveedor de telecomunicaciones que se enfrenta al desafío de retener a sus clientes en un mercado altamente competitivo. La retención de clientes es esencial para el éxito a largo plazo de la empresa.")
+
+    st.write("-La retención de clientes se refiere a la capacidad de una empresa para mantener a sus clientes actuales, evitando que se den de baja o 'den churn'. Esta métrica es crítica en un mercado donde adquirir nuevos clientes puede ser costoso y mantener a los clientes existentes puede ser más rentable.")
+
+    st.write("-En este proyecto, hemos sido encargados por TelecomConnect para llevar a cabo un análisis en profundidad de sus datos y desarrollar un modelo de predicción de Churn. Este modelo nos permitirá anticiparnos a las bajas de clientes y tomar medidas proactivas para retenerlos.")
+
+    st.write("-Nuestro objetivo es ayudar a TelecomConnect a entender mejor a sus clientes, identificar patrones de comportamiento y predecir quiénes son más propensos a darse de baja. Al hacerlo, la empresa podrá implementar estrategias de retención más efectivas y mejorar la satisfacción del cliente.")
+
+    st.write("-A lo largo de este proyecto, utilizaremos una base de datos proporcionada por TelecomConnect que contiene una variedad de variables relacionadas con los clientes y su interacción con los servicios de telecomunicaciones.")
+
+
 
 elif seccion == 'Análisis EDA':
     st.write('Bienvenido a la sección de Análisis EDA.')
 
     
-    # Agrega la ruta al directorio y carga los datos
     sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
     train_csv = 'src/data/raw/customer_churn_dataset-training-master.csv'
     test_csv = 'src/data/raw/customer_churn_dataset-testing-master.csv'
@@ -42,23 +53,35 @@ elif seccion == 'Análisis EDA':
     # Título de la sección
     st.title('Análisis Exploratorio de Datos (EDA)')
 
-    # Información general del DataFrame
-    st.subheader('Información general del DataFrame:')
-    st.write(df_concatenado.info())
 
-    # Número de valores únicos en cada columna
-    st.subheader('Número de valores únicos en cada columna:')
-    st.write(df_concatenado.nunique())
+    # Título
+    st.write("## Información del DataFrame de Clientes")
 
-    # Muestra las primeras 5 filas del DataFrame
-    st.subheader('Primeras 5 filas del DataFrame:')
-    st.write(df_concatenado.head(5))
+    # Descripción de las variables
+    st.write("El DataFrame contiene información detallada sobre clientes y sus interacciones con una empresa. A continuación, se describen las variables presentes en este conjunto de datos:")
+
+    st.write("- **CustomerID**: Identificador único para cada cliente. Tipo de dato: Número de punto flotante.")
+    st.write("- **Age**: Edad de los clientes. Tipo de dato: Número de punto flotante.")
+    st.write("- **Gender**: Género de los clientes. Tipo de dato: Cadena de texto (objeto).")
+    st.write("- **Tenure**: Antigüedad de la relación del cliente con la empresa. Tipo de dato: Número de punto flotante.")
+    st.write("- **Usage Frequency**: Frecuencia de uso de los servicios. Tipo de dato: Número de punto flotante.")
+    st.write("- **Support Calls**: Cantidad de llamadas de soporte. Tipo de dato: Número de punto flotante.")
+    st.write("- **Payment Delay**: Retraso en los pagos. Tipo de dato: Número de punto flotante.")
+    st.write("- **Subscription Type**: Tipo de suscripción del cliente. Tipo de dato: Cadena de texto (objeto).")
+    st.write("- **Contract Length**: Duración del contrato. Tipo de dato: Cadena de texto (objeto).")
+    st.write("- **Total Spend**: Gasto total del cliente. Tipo de dato: Número de punto flotante.")
+    st.write("- **Last Interaction**: Fecha de la última interacción del cliente. Tipo de dato: Número de punto flotante.")
+    st.write("- **Churn**: Indicador de cancelación del cliente. Tipo de dato: Número de punto flotante.")
+    st.write("- **Dataset**: Etiqueta del conjunto de datos. Tipo de dato: Cadena de texto (objeto).")
+
+    st.write("Estas variables proporcionan información valiosa sobre la base de clientes de la empresa, incluyendo detalles demográficos, comportamiento de uso y métricas relacionadas con la retención de clientes. Puedes utilizar esta información para realizar análisis y visualizaciones en tu aplicación de Streamlit.")
+
+
 
     # Variables numéricas y categóricas
     variables_numericas = ['Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
     variables_categoricas = ['Gender', 'Subscription Type', 'Contract Length']
 
-    # Análisis Univariable de Variables Numéricas
     st.subheader('Estadísticas de Variables Numéricas:')
     st.write(df_concatenado[variables_numericas].describe())
 
@@ -70,7 +93,7 @@ elif seccion == 'Análisis EDA':
         plt.title(f'Distribución de {variable}')
         plt.xlabel(variable)
         plt.ylabel('Frecuencia')
-        st.pyplot(plt)  # Muestra el gráfico con plt en lugar de sns.histplot
+        st.pyplot(plt) 
         st.write(f'Distribución de {variable}')
 
     # Visualización de Diagramas de Caja para Variables Numéricas
@@ -80,7 +103,7 @@ elif seccion == 'Análisis EDA':
         sns.boxplot(data=df_concatenado, y=variable)
         plt.title(f'Gráfico de Bigote de {variable}')
         plt.ylabel(variable)
-        st.pyplot()  # Usar st.pyplot() para mostrar el gráfico
+        st.pyplot()  
         st.write(f'Gráfico de Bigote de {variable}')
 
     # Visualización de la Distribución de Variables Categóricas
@@ -91,7 +114,7 @@ elif seccion == 'Análisis EDA':
         labels = counts.index
         plt.pie(counts, labels=labels,autopct='%1.1f%%')
         plt.title(f'Distribución de {variable}')
-        st.pyplot()  # Usar st.pyplot() para mostrar el gráfico
+        st.pyplot()
         st.write(f'Distribución de {variable}')
 
     st.write('A continuación se presentan algunas estadísticas clave de las variables:')
@@ -163,7 +186,7 @@ elif seccion == 'Análisis EDA':
     st.subheader('Matriz de Correlación:')
     st.write('La matriz de correlación muestra las relaciones entre las variables numéricas y el target (Churn).')
 
-    # Mostrar la matriz de correlación como un gráfico de calor
+    # Mostrar la matriz de correlación
     plt.figure(figsize=(10, 6))
     sns.heatmap(correlacion_matrix, annot=True, cmap='coolwarm')
     st.pyplot()
@@ -181,7 +204,7 @@ elif seccion == 'Análisis EDA':
     st.subheader('Proceso de Escalado y Codificación de Datos:')
     st.write('En este bloque de código, se realizaron una serie de transformaciones en los datos para prepararlos para el análisis y modelado. A continuación, se resumen las principales acciones realizadas:')
 
-    # Añade el resumen del proceso de escalamiento y codificación aquí
+
     st.write('1. Codificación de Variables Categóricas: Se aplicó la codificación one-hot (get_dummies)'
               'a las variables categóricas "Gender" y "Subscription Type". Esto se hizo para convertir' 
               'las variables categóricas en variables numéricas binarias (0 o 1), lo que es esencial para'
@@ -209,11 +232,97 @@ elif seccion == 'Análisis EDA':
 
 elif seccion == 'Entrenamiento Modelo':
     st.write('Bienvenido a la sección de Entrenamiento del Modelo.')
-    # Agrega aquí el contenido de la sección de Entrenamiento del Modelo
 
+    # Cargar los resultados del entrenamiento del modelo
+    ruta = 'C:/Users/Hp/Desktop/ProyectoML_churn/src/data/processed/df_resultados.csv'
+    resultados_df = pd.read_csv(ruta)
+
+    # Información sobre el entrenamiento del modelo
+    st.write('No utilizamos la división de tren y prueba ya que el conjunto de prueba fue proporcionado por la empresa.')
+
+    
+    # Modelos utilizados
+    st.subheader('Modelos utilizados')
+    st.write('Para entrenar el modelo, utilizamos los siguientes clasificadores:')
+    st.write('- Regresión Logística')
+    st.write('- Árbol de Decisión')
+    st.write('- Random Forest')
+    st.write('- Gradient Boosting')
+    st.write('- K-Nearest Neighbor')
+    st.write('- Gaussian Naive Bayes')
+
+    # Mostrar los resultados del entrenamiento
+    st.subheader('Resultados del entrenamiento del modelo')
+    st.dataframe(resultados_df)
+
+    st.subheader('Resultados de los Hiperparametros')
+    st.title("Resultados del Modelo")
+
+    #diccionarios
+    resultados = {
+        "Random Forest": {
+            "Precisión": 0.6311,
+            "Informe de clasificación": """
+                precision    recall  f1-score   support
+            0.0       0.98      0.10      0.18     21097
+            1.0       0.62      1.00      0.76     30493
+        accuracy                           0.63     51590
+    macro avg       0.80      0.55      0.47     51590
+    weighted avg       0.76      0.63      0.52     51590
+            """
+        },
+        "Decision Tree": {
+            "Precisión": 0.6381,
+            "Informe de clasificación": """
+                precision    recall  f1-score   support
+            0.0       0.98      0.12      0.21     21097
+            1.0       0.62      1.00      0.77     30493
+        accuracy                           0.64     51590
+    macro avg       0.80      0.56      0.49     51590
+    weighted avg       0.77      0.64      0.54     51590
+            """
+        },
+        "Regresión Logística": {
+            "Precisión": 0.7198,
+            "Informe de clasificación": """
+                precision    recall  f1-score   support
+            0.0       0.94      0.33      0.49     21097
+            1.0       0.68      0.99      0.81     30493
+        accuracy                           0.72     51590
+    macro avg       0.81      0.66      0.65     51590
+    weighted avg       0.79      0.72      0.68     51590
+            """
+        },
+        "K-Nearest Neighbors": {
+            "Precisión": 0.6423,
+            "Informe de clasificación": """
+                precision    recall  f1-score   support
+            0.0       0.96      0.13      0.23     21097
+            1.0       0.62      1.00      0.77     30493
+        accuracy                           0.64     51590
+    macro avg       0.79      0.56      0.50     51590
+    weighted avg       0.76      0.64      0.55     51590
+            """
+        },
+        "Gaussian Naive Bayes": {
+            "Precisión": 0.6581,
+            "Informe de clasificación": """
+                precision    recall  f1-score   support
+            0.0       0.98      0.17      0.29     21097
+            1.0       0.63      1.00      0.78     30493
+        accuracy                           0.66     51590
+    macro avg       0.81      0.58      0.53     51590
+    weighted avg       0.78      0.66      0.58     51590
+            """
+        }
+    }
+
+    for modelo, datos in resultados.items():
+        st.subheader(modelo)
+        st.markdown(f"Precisión: {datos['Precisión']:.4f}")
+        st.write(f"Informe de clasificación:\n{datos['Informe de clasificación']}")
 elif seccion == 'Predicción':
     st.write('Bienvenido a la sección de Predicción.')
-    # Agrega aquí el contenido de la sección de Predicción
 
     # Subir archivo CSV
     subir_archivo = st.file_uploader("Cargar archivo CSV", type=["csv"])
@@ -231,7 +340,6 @@ elif seccion == 'Predicción':
             # Ejecutar la función para escalar y codificar los datos
             df = escalar_y_codificar(df)
 
-            # Obtener las variables de entrada para el modelo
             X_test = df[variables_features]
 
             # Realizar predicciones y obtener probabilidades
@@ -275,7 +383,6 @@ elif seccion == 'Predicción':
             # Agregar espacio entre elementos
             st.markdown('<br>', unsafe_allow_html=True)
 
-            # Estilizar botones
             st.write(
                 '<style>div.Widget.row-widget.stButton > div{background-color: #3498db; color: white; text-align: center}</style>',
                 unsafe_allow_html=True
@@ -284,6 +391,36 @@ elif seccion == 'Predicción':
             # Agregar espacio entre elementos
             st.markdown('<br>', unsafe_allow_html=True)
 
+elif seccion == 'Conclusiones y Recomendaciones':
+    st.title('Conclusiones y Recomendaciones')
 
+    # conclusiones y recomendaciones
+
+    st.write('El modelo creado tiene una efectividad del 70%, por lo que se solicita a la empresa más información'
+
+        '(variables y datos adicionales) para intentar mejorar el modelo y sus predicciones.')
+
+    st.write('Las variables que más afectan a la pérdida de clientes son el soporte de llamadas,' 
+
+        'lo que sugiere prestar atención a la calidad del servicio proporcionado por la empresa' 
+
+        'para evitar la fuga de clientes. Aquellos clientes que realizan más llamadas probablemente' 
+
+        'tengan problemas no resueltos.')
+
+    st.write('Además, se observó que los contratos mensuales tienen un alto promedio de deserción de la empresa.'
+
+        'Se recomienda explorar estrategias para retener a estos clientes, como la oferta de contratos a más'
+
+        'largo plazo.')
+
+    st.write('Se sugiere la generación de una campaña de retención utilizando el análisis predictivo para' 
+
+        'evaluar su eficacia. Mientras tanto, se espera obtener nuevos datos para mejorar el modelo y,' 
+
+        'por ende, las predicciones.')
+    
+
+    
 
 

@@ -207,6 +207,7 @@ df_concatenado = escalar_y_codificar(df_concatenado)
 
 
 df_clean = df_concatenado.copy()
+print(df_clean)
 
 csv_ruta = "src/data/processed/df_clean.csv"
 

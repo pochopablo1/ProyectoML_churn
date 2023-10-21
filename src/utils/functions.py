@@ -31,11 +31,10 @@ def cargar_y_preprocesar_datos(train_csv, test_csv):
 
 
 def escalar_y_codificar(df):
-    # Aplica get_dummies a las variables categóricas
-    dummies = pd.get_dummies(df[["Gender", 'Subscription Type']], drop_first=True)
+    dummies = pd.get_dummies(df[['Gender', 'Subscription Type']], drop_first=True)
+    dummies = dummies.astype(int)  # Convierte las columnas binarias en enteros 0 y 1
     df = pd.concat([df, dummies], axis=1)
-    df = df.drop(["Gender", 'Subscription Type'], axis=1)
-
+    df = df.drop(['Gender', 'Subscription Type'], axis=1)
     # Codifica la variable Contract Length
     df['Contract Length_cod'] = df['Contract Length'].apply(lambda x: 1 if x in ('Annual', 'Quarterly') else 0)
 
