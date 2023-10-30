@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import joblib
 import streamlit as st
@@ -7,242 +6,184 @@ import os
 import sys
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
+from utils.functions import scale_and_encode, load_and_predict_model, load_and_preprocess_data, prepare_data
 
+# Sidebar menu
+st.sidebar.title('Menu')
+section = st.sidebar.radio('Go to section:', ('Introduction', 'EDA Analysis', 'Model Training', 'Prediction', 'Conclusions and Recommendations'))
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
-sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
-
-from utils.functions import escalar_y_codificar, cargar_y_predecir_modelo, cargar_y_preprocesar_datos, preparar_datos
-
-
-
-
-# menu lateral
-st.sidebar.title('Menú')
-seccion = st.sidebar.radio('Ir a sección:', ('Introducción', 'Análisis EDA', 'Entrenamiento Modelo', 'Predicción','Conclusiones y Recomendaciones'))
-
-# Contenido de la sección
-if seccion == 'Introducción':
-
-    st.title('Introduccion')
+# Section content
+if section == 'Introduction':
+    st.title('Introduction')
     
-    # Información sobre el proyecto
+    # Project information
+    st.write("- TelecomConnect is a telecommunications provider facing the challenge of retaining its customers in a highly competitive market. Customer retention is essential for the long-term success of the company.")
+    st.write("- Customer retention refers to a company's ability to keep its current customers from churning or canceling their services. This metric is critical in a market where acquiring new customers can be costly, and retaining existing customers can be more profitable.")
+    st.write("- In this project, we have been commissioned by TelecomConnect to conduct an in-depth analysis of their data and develop a churn prediction model. This model will allow us to anticipate customer churn and take proactive measures to retain them.")
+    st.write("- Our goal is to help TelecomConnect better understand their customers, identify behavioral patterns, and predict who is more likely to churn. By doing so, the company can implement more effective retention strategies and improve customer satisfaction.")
+    st.write("- Throughout this project, we will use a database provided by TelecomConnect containing various customer-related variables and their interactions with telecommunications services.")
 
-    st.write("-TelecomConnect es un proveedor de telecomunicaciones que se enfrenta al desafío de retener a sus clientes en un mercado altamente competitivo. La retención de clientes es esencial para el éxito a largo plazo de la empresa.")
+elif section == 'EDA Analysis':
+    st.write('Welcome to the EDA Analysis section.')
 
-    st.write("-La retención de clientes se refiere a la capacidad de una empresa para mantener a sus clientes actuales, evitando que se den de baja o 'den churn'. Esta métrica es crítica en un mercado donde adquirir nuevos clientes puede ser costoso y mantener a los clientes existentes puede ser más rentable.")
-
-    st.write("-En este proyecto, hemos sido encargados por TelecomConnect para llevar a cabo un análisis en profundidad de sus datos y desarrollar un modelo de predicción de Churn. Este modelo nos permitirá anticiparnos a las bajas de clientes y tomar medidas proactivas para retenerlos.")
-
-    st.write("-Nuestro objetivo es ayudar a TelecomConnect a entender mejor a sus clientes, identificar patrones de comportamiento y predecir quiénes son más propensos a darse de baja. Al hacerlo, la empresa podrá implementar estrategias de retención más efectivas y mejorar la satisfacción del cliente.")
-
-    st.write("-A lo largo de este proyecto, utilizaremos una base de datos proporcionada por TelecomConnect que contiene una variedad de variables relacionadas con los clientes y su interacción con los servicios de telecomunicaciones.")
-
-
-
-elif seccion == 'Análisis EDA':
-    st.write('Bienvenido a la sección de Análisis EDA.')
-
-    
     sys.path.append("C:/Users/Hp/Desktop/ProyectoML_churn")
     train_csv = 'src/data/raw/customer_churn_dataset-training-master.csv'
     test_csv = 'src/data/raw/customer_churn_dataset-testing-master.csv'
-    df_concatenado, customer_ids = cargar_y_preprocesar_datos(train_csv, test_csv)
+    df_concatenated, customer_ids = load_and_preprocess_data(train_csv, test_csv)
 
-    # Título de la sección
-    st.title('Análisis Exploratorio de Datos (EDA)')
+    # Section title
+    st.title('Exploratory Data Analysis (EDA)')
 
+    # Section title
+    st.write("## Customer DataFrame Information")
 
-    # Título
-    st.write("## Información del DataFrame de Clientes")
+    # Variable descriptions
+    st.write("The DataFrame contains detailed information about customers and their interactions with a company. The following variables are present in this dataset:")
+    st.write("- **CustomerID**: Unique identifier for each customer. Data type: float.")
+    st.write("- **Age**: Age of the customers. Data type: float.")
+    st.write("- **Gender**: Gender of the customers. Data type: object.")
+    st.write("- **Tenure**: Customer's tenure with the company. Data type: float.")
+    st.write("- **Usage Frequency**: Frequency of service usage. Data type: float.")
+    st.write("- **Support Calls**: Number of support calls. Data type: float.")
+    st.write("- **Payment Delay**: Payment delay. Data type: float.")
+    st.write("- **Subscription Type**: Customer's subscription type. Data type: string.")
+    st.write("- **Contract Length**: Contract duration. Data type: string.")
+    st.write("- **Total Spend**: Customer's total spending. Data type: float.")
+    st.write("- **Last Interaction**: Date of the last customer interaction. Data type: float.")
+    st.write("- **Churn**: Customer churn indicator. Data type: float.")
+    st.write("- **Dataset**: Dataset label. Data type: string.")
+    st.write("These variables provide valuable information about the company's customer base, including demographic details, usage behavior, and customer retention metrics. You can use this information for analysis and visualizations in your Streamlit application.")
 
-    # Descripción de las variables
-    st.write("El DataFrame contiene información detallada sobre clientes y sus interacciones con una empresa. A continuación, se describen las variables presentes en este conjunto de datos:")
+    # Numeric and categorical variables
+    numeric_variables = ['Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
+    categorical_variables = ['Gender', 'Subscription Type', 'Contract Length']
 
-    st.write("- **CustomerID**: Identificador único para cada cliente. Tipo de dato: Número de punto flotante.")
-    st.write("- **Age**: Edad de los clientes. Tipo de dato: Número de punto flotante.")
-    st.write("- **Gender**: Género de los clientes. Tipo de dato: Cadena de texto (objeto).")
-    st.write("- **Tenure**: Antigüedad de la relación del cliente con la empresa. Tipo de dato: Número de punto flotante.")
-    st.write("- **Usage Frequency**: Frecuencia de uso de los servicios. Tipo de dato: Número de punto flotante.")
-    st.write("- **Support Calls**: Cantidad de llamadas de soporte. Tipo de dato: Número de punto flotante.")
-    st.write("- **Payment Delay**: Retraso en los pagos. Tipo de dato: Número de punto flotante.")
-    st.write("- **Subscription Type**: Tipo de suscripción del cliente. Tipo de dato: Cadena de texto (objeto).")
-    st.write("- **Contract Length**: Duración del contrato. Tipo de dato: Cadena de texto (objeto).")
-    st.write("- **Total Spend**: Gasto total del cliente. Tipo de dato: Número de punto flotante.")
-    st.write("- **Last Interaction**: Fecha de la última interacción del cliente. Tipo de dato: Número de punto flotante.")
-    st.write("- **Churn**: Indicador de cancelación del cliente. Tipo de dato: Número de punto flotante.")
-    st.write("- **Dataset**: Etiqueta del conjunto de datos. Tipo de dato: Cadena de texto (objeto).")
+    st.subheader('Statistics for Numeric Variables:')
+    st.write(df_concatenated[numeric_variables].describe())
 
-    st.write("Estas variables proporcionan información valiosa sobre la base de clientes de la empresa, incluyendo detalles demográficos, comportamiento de uso y métricas relacionadas con la retención de clientes. Puedes utilizar esta información para realizar análisis y visualizaciones en tu aplicación de Streamlit.")
-
-
-
-    # Variables numéricas y categóricas
-    variables_numericas = ['Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
-    variables_categoricas = ['Gender', 'Subscription Type', 'Contract Length']
-
-    st.subheader('Estadísticas de Variables Numéricas:')
-    st.write(df_concatenado[variables_numericas].describe())
-
-    
-    # Visualización de la Distribución de Variables Categóricas
-    st.subheader('Visualización de la Distribución de Variables Categóricas:')
-    for variable in variables_categoricas:
+    # Visualization of Categorical Variables Distribution
+    st.subheader('Visualization of Categorical Variables Distribution:')
+    for variable in categorical_variables:
         plt.figure(figsize=(6, 4))
-        counts = df_concatenado[variable].value_counts()
+        counts = df_concatenated[variable].value_counts()
         labels = counts.index
-        plt.pie(counts, labels=labels,autopct='%1.1f%%')
-        plt.title(f'Distribución de {variable}')
+        plt.pie(counts, labels=labels, autopct='%1.1f%%')
+        plt.title(f'Distribution of {variable}')
         st.pyplot()
-        st.write(f'Distribución de {variable}')
+        st.write(f'Distribution of {variable}')
 
-    st.write('A continuación se presentan algunas estadísticas clave de las variables:')
-    st.write('- Age: La edad promedio es de aproximadamente 39 años, con una distribución que va desde 18 hasta 65 años.')
-    st.write('- Tenure: La tenencia promedio es de aproximadamente 31 meses, con valores que van desde 1 hasta 60 meses.')
-    st.write('- Usage Frequency: La frecuencia de uso promedio es de aproximadamente 15,7, con valores que van desde 1 hasta 30.')
-    st.write('- Support Calls: El número promedio de llamadas de soporte es de aproximadamente 3,8, con valores que van desde 0 hasta 10.')
-    st.write('- Payment Delay: El retraso promedio en el pago es de aproximadamente 13,5, con valores que van desde 0 hasta 30.')
-    st.write('- Total Spend: El gasto total promedio es de aproximadamente 620, con valores que van desde 100 hasta 1,000.')
-    st.write('- Last Interaction: El tiempo promedio desde la última interacción es de aproximadamente 14,6 unidades de tiempo, con valores que van desde 1 hasta 30.')
+    st.write('Here are some key statistics for the variables:')
+    st.write('- Age: The average age is approximately 39 years, with a range from 18 to 65 years.')
+    st.write('- Tenure: The average tenure is approximately 31 months, with values ranging from 1 to 60 months.')
+    st.write('- Usage Frequency: The average usage frequency is approximately 15.7, with values ranging from 1 to 30.')
+    st.write('- Support Calls: The average number of support calls is approximately 3.8, with values ranging from 0 to 10.')
+    st.write('- Payment Delay: The average payment delay is approximately 13.5, with values ranging from 0 to 30.')
+    st.write('- Total Spend: The average total spending is approximately 620, with values ranging from 100 to 1,000.')
+    st.write('- Last Interaction: The average time since the last interaction is approximately 14.6 time units, with values ranging from 1 to 30.')
 
-    # Relación entre variables numéricas y target
-    for variable in variables_numericas:
-        st.subheader(f'Relación entre {variable} y Churn:')
-
-        # Histograma
+    # Relationship between numeric variables and target
+    for variable in numeric_variables:
+        st.subheader(f'Relationship between {variable} and Churn:')
+        
+        # Histogram
         plt.figure(figsize=(8, 4))
-        sns.histplot(data=df_concatenado, x=variable, hue='Churn', kde=True)
-        plt.title(f'Distribución de {variable} por Churn')
+        sns.histplot(data=df_concatenated, x=variable, hue='Churn', kde=True)
+        plt.title(f'Distribution of {variable} by Churn')
         plt.xlabel(variable)
-        plt.ylabel('Frecuencia')
+        plt.ylabel('Frequency')
         st.pyplot()
         plt.close()
-
-        # Diagrama de Caja
+        
+        # Box Plot
         plt.figure(figsize=(8, 5))
-        sns.boxplot(data=df_concatenado, x='Churn', y=variable)
-        plt.title(f'Relación entre Churn y {variable}')
+        sns.boxplot(data=df_concatenated, x='Churn', y=variable)
+        plt.title(f'Relationship between Churn and {variable}')
         plt.xlabel('Churn')
         plt.ylabel(variable)
         st.pyplot()
         plt.close()
-        
-    st.write('La variable Age tiene incidencia en el target. El promedio de edad de los que dejan la empresa es mayor a los que no.')
+    
+    st.write('The Age variable has an impact on the target. The average age of those who leave the company is higher than those who stay.')
+    st.write('The Tenure and Usage Frequency variables seem to have no influence on the target.')
+    st.write('Support Calls show a significant difference between those who stay with the company (low average calls) and those who left (high average calls). We find outliers in customers who stay with the company (we will analyze later).')
+    st.write('Customers who leave the company have a higher average of payment delay days.')
+    st.write('The Total Spend variable also appears to influence our target. Customers who spend more are the ones who decide to stay with the company. We find outliers in customers who stay with the company (we will analyze later).')
+    st.write('Lastly, we observe that customers who leave the company, on average, have not made transactions for a longer time.')
 
-    st.write('Las variables Tenure y Usage Frequency parecen no tener influencia en la variable target.')
-
-    st.write('Support Calls tiene mucha diferencia entre los que se quedan en la empresa (bajo promedio de llamadas) y los que se fueron (alto promedio de llamadas). Encontramos valores atípicos en los clientes que se quedan en la empresa (luego vamos a analizar).')
-
-    st.write('Los clientes que se van de la empresa tienen un promedio más alto de días en demoras de pagos.')
-
-    st.write('La variable Total Spend también parece tener influencia en nuestros target. Los clientes que más gastan son los que deciden quedarse en la empresa. Encontramos valores atípicos en los clientes que se quedan en la empresa (luego vamos a analizar).')
-
-    st.write('Por último, observamos que los clientes que se van de la empresa en promedio, hace más tiempo que no realizan transacciones.')
-
-
-    # Relación entre variables categóricas y target (churn)
-    for variable in variables_categoricas:
-        st.subheader(f'Relación entre {variable} y Churn:')
+    # Relationship between categorical variables and target (churn)
+    for variable in categorical_variables:
+        st.subheader(f'Relationship between {variable} and Churn:')
         plt.figure(figsize=(8, 5))
-        sns.countplot(data=df_concatenado, x=variable, hue='Churn')
-        plt.title(f'Relación entre Churn y {variable}')
+        sns.countplot(data=df_concatenated, x=variable, hue='Churn')
+        plt.title(f'Relationship between Churn and {variable}')
         plt.xlabel(variable)
-        plt.ylabel('Frecuencia')
+        plt.ylabel('Frequency')
         plt.legend(title='Churn', loc='upper right', labels=['No Churn', 'Churn'])
         st.pyplot()
         plt.close()
 
-    st.write('Las mujeres parecen ser más propensas a irse de la empresa (variable Gender).')
+    st.write('Females seem to be more likely to leave the company (Gender variable).')
+    st.write('No differences are observed between different types of subscriptions.')
+    st.write('Annual and quarterly contracts have a similar behavior with the target, but customers with monthly contracts are leaving the company.')
 
-    st.write('No se observan diferencias entre los diferentes tipos de suscripciones.')
+    # Correlations between numeric variables
+    correlation_matrix = df_concatenated[['Churn', 'Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Total Spend', 'Last Interaction', 'Payment Delay']].corr()
 
-    st.write('Los contratos anuales y cuatrimestrales tienen un comportamiento similar con el target, pero los clientes con contratos mensuales se van de la empresa.')
+    st.subheader('Correlation Matrix:')
+    st.write('The correlation matrix shows the relationships between numeric variables and the target (Churn).')
 
-
-    # Correlaciones entre variables numéricas
-    correlacion_matrix = df_concatenado[['Churn', 'Age', 'Tenure', 'Usage Frequency', 'Support Calls', 'Total Spend', 'Last Interaction', 'Payment Delay']].corr()
-
-    st.subheader('Matriz de Correlación:')
-    st.write('La matriz de correlación muestra las relaciones entre las variables numéricas y el target (Churn).')
-
-    # Mostrar la matriz de correlación
+    # Show the correlation matrix
     plt.figure(figsize=(10, 6))
-    sns.heatmap(correlacion_matrix, annot=True, cmap='coolwarm')
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
     st.pyplot()
     plt.close()
 
-    # Comentarios sobre la matriz de correlación
-    st.write('Comentarios sobre la matriz de correlación:')
-    st.write('Churn está altamente correlacionado con Support Calls, Total Spend y Payment Delay.')
-    st.write('Age y Tenure tienen correlaciones bajas con Churn, lo que sugiere una influencia limitada en la retención.')
-    st.write('Support Calls y Payment Delay también tienen una correlación significativa con Total Spend.')
+    # Comments on the correlation matrix
+    st.write('Comments on the correlation matrix:')
+    st.write('Churn is highly correlated with Support Calls, Total Spend, and Payment Delay.')
+    st.write('Age and Tenure have low correlations with Churn, suggesting limited influence on retention.')
+    st.write('Support Calls and Payment Delay also have significant correlations with Total Spend.')
+
+    # Data Scaling and Encoding Process
+    st.subheader('Data Scaling and Encoding Process:')
+    st.write('In this code block, a series of data transformations were performed to prepare them for analysis and modeling. The main actions taken are summarized below:')
+    st.write('1. Encoding Categorical Variables: One-hot encoding (get_dummies) was applied to the categorical variable "Gender." This was done to convert categorical variables into binary numeric variables (0 or 1), which is essential for machine learning algorithms to use.')
+    st.write('2. Encoding of the "Contract Length" Variable: A new variable called "Contract Length_cod" was created, set to 1 if the original value in "Contract Length" is "Annual" or "Quarterly," and 0 for "Monthly." This allows binary representation of the contract duration. This action was taken because the unmodified variable had a negative impact on the model, and it was observed that there were almost no differences between annual and quarterly contracts, so they were grouped into 1 and monthly contracts into another group.')
+    st.write('3. Standardization of Numeric Variables: The numeric columns "Age," "Support Calls," "Payment Delay," "Total Spend," and "Last Interaction" were selected. MinMaxScaler was then used to standardize these variables, ensuring that they all have a similar value range (between 0 and 1) for better performance in machine learning models.')
 
 
+elif section == 'Model Training':
+    st.write('Welcome to the Model Training section.')
 
-        # Proceso de Escalado y Codificación de Datos
-    st.subheader('Proceso de Escalado y Codificación de Datos:')
-    st.write('En este bloque de código, se realizaron una serie de transformaciones en los datos para prepararlos para el análisis y modelado. A continuación, se resumen las principales acciones realizadas:')
+    # Load model training results
+    path = 'C:/Users/Hp/Desktop/ProyectoML_churn/src/data/processed/df_resultados.csv'
+    results_df = pd.read_csv(path)
 
+    # Information about model training
+    st.write('(We did not use the train-test split as the test dataset was provided by the company.)')
 
-    st.write('1. Codificación de Variables Categóricas: Se aplicó la codificación one-hot (get_dummies)'
-              'a la variable categórica "Gender". Esto se hizo para convertir' 
-              'las variables categóricas en variables numéricas binarias (0 o 1), lo que es esencial para'
-              'que los algoritmos de machine learning las utilicen.')
-
-    st.write('2. Codificación de la Variable "Contract Length": Se creó una nueva variable llamada'
-              '"Contract Length_cod", que se establece en 1 si el valor original en "Contract Length" es'
-              '"Annual" o "Quarterly", y 0 en caso de "Monthly". Esto permite representar la duración del'
-              'contrato de manera binaria.'
-              'Esta acción se llevó a cabo porque la variable sin modificaciones perjudicaba al modelo y al'
-              'observar que la no habia casi diferencias entre los contratos anuales y cuatrimestrales se los'
-              'agrupó en 1 y mensual en otro grupo')
-
-    st.write('3. Estandarización de Variables Numéricas: Se seleccionaron las columnas numéricas "Age", '
-             '"Support Calls", "Payment Delay", "Total Spend" y "Last Interaction". Luego, se utilizó el '
-             'escalador MinMaxScaler para llevar a cabo la estandarización de estas variables, lo que'
-             'asegura que todas tengan un rango de valores similar (entre 0 y 1) para un mejor rendimiento'
-             'en los modelos de machine learning.')
-
-
-
-
-
-
-
-elif seccion == 'Entrenamiento Modelo':
-    st.write('Bienvenido a la sección de Entrenamiento del Modelo.')
-
-    # Cargar los resultados del entrenamiento del modelo
-    ruta = 'C:/Users/Hp/Desktop/ProyectoML_churn/src/data/processed/df_resultados.csv'
-    resultados_df = pd.read_csv(ruta)
-
-    # Información sobre el entrenamiento del modelo
-    st.write('No utilizamos la división de tren y prueba ya que el conjunto de prueba fue proporcionado por la empresa.')
-
-    
-    # Modelos utilizados
-    st.subheader('Modelos utilizados')
-    st.write('Para entrenar el modelo, utilizamos los siguientes clasificadores:')
-    st.write('- Regresión Logística')
-    st.write('- Árbol de Decisión')
+    # Used Models
+    st.subheader('Used Models')
+    st.write('To train the model, we used the following classifiers:')
+    st.write('- Logistic Regression')
+    st.write('- Decision Tree')
     st.write('- Random Forest')
     st.write('- Gradient Boosting')
     st.write('- K-Nearest Neighbor')
     st.write('- Gaussian Naive Bayes')
 
-    # Mostrar los resultados del entrenamiento
-    st.subheader('Resultados del entrenamiento del modelo')
-    st.dataframe(resultados_df)
+    # Display model training results
+    st.subheader('Model Training Results')
+    st.dataframe(results_df)
 
-    st.subheader('Resultados de los Hiperparametros')
-    st.title("Resultados del Modelo")
+    st.subheader('Hyperparameter Results')
+    st.title("Model Results")
 
-    #diccionarios
-    resultados = {
+    # Dictionaries
+    results = {
         "Random Forest": {
-            "Precisión": 0.6311,
-            "Informe de clasificación": """
+            "Accuracy": 0.6311,
+            "Classification Report": """
                 precision    recall  f1-score   support
             0.0       0.98      0.10      0.18     21097
             1.0       0.62      1.00      0.76     30493
@@ -252,8 +193,8 @@ elif seccion == 'Entrenamiento Modelo':
             """
         },
         "Decision Tree": {
-            "Precisión": 0.6381,
-            "Informe de clasificación": """
+            "Accuracy": 0.6381,
+            "Classification Report": """
                 precision    recall  f1-score   support
             0.0       0.98      0.12      0.21     21097
             1.0       0.62      1.00      0.77     30493
@@ -262,9 +203,9 @@ elif seccion == 'Entrenamiento Modelo':
     weighted avg       0.77      0.64      0.54     51590
             """
         },
-        "Regresión Logística": {
-            "Precisión": 0.7198,
-            "Informe de clasificación": """
+        "Logistic Regression": {
+            "Accuracy": 0.7198,
+            "Classification Report": """
                 precision    recall  f1-score   support
             0.0       0.94      0.33      0.49     21097
             1.0       0.68      0.99      0.81     30493
@@ -274,8 +215,8 @@ elif seccion == 'Entrenamiento Modelo':
             """
         },
         "K-Nearest Neighbors": {
-            "Precisión": 0.6423,
-            "Informe de clasificación": """
+            "Accuracy": 0.6423,
+            "Classification Report": """
                 precision    recall  f1-score   support
             0.0       0.96      0.13      0.23     21097
             1.0       0.62      1.00      0.77     30493
@@ -285,8 +226,8 @@ elif seccion == 'Entrenamiento Modelo':
             """
         },
         "Gaussian Naive Bayes": {
-            "Precisión": 0.6581,
-            "Informe de clasificación": """
+            "Accuracy": 0.6581,
+            "Classification Report": """
                 precision    recall  f1-score   support
             0.0       0.98      0.17      0.29     21097
             1.0       0.63      1.00      0.78     30493
@@ -297,82 +238,77 @@ elif seccion == 'Entrenamiento Modelo':
         }
     }
 
+    for model, data in results.items():
+        st.subheader(model)
+        st.markdown(f"Accuracy: {data['Accuracy']:.4f}")
+        st.write(f"Classification Report:\n{data['Classification Report']}")
 
-    
+    st.write('Reasons for choosing Logistic Regression:')
+    st.write('- Reliable Performance (ROC-AUC: 0.76):')
+    st.write('- Like other models, it predicts almost 0.1 for positives (customers who leave).')
+    st.write('- Balance Between Sensitivity and Specificity:')
+    st.write('- This model achieves an accuracy of 0.71, an effective balance between detecting customers who will churn and those who will not, which is crucial in a churn problem.')
 
-    for modelo, datos in resultados.items():
-        st.subheader(modelo)
-        st.markdown(f"Precisión: {datos['Precisión']:.4f}")
-        st.write(f"Informe de clasificación:\n{datos['Informe de clasificación']}")
+elif section == 'Prediction':
+    st.write('Welcome to the Prediction section.')
 
-    st.write("Motivos para elegir la Regresión Logística:")
-    st.write("- Rendimiento Confiable (ROC-AUC: 0.76):")
-    st.write("- AL igual que los demas modelos, predice casi al 0.1 los positivos (clientes que se van)")
-    st.write("- Equilibrio Entre Sensibilidad y Especificidad:")
-    st.write("- Este modelo logra acuraccy de 0.71, un equilibrio efectivo entre detectar clientes que abandonarán y los que no lo harán, lo que es fundamental en un problema de churn.")
+    # Upload CSV file
+    upload_file = st.file_uploader("Upload CSV file", type=["csv"])
 
+    feature_variables = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction', 'Gender_Male', 'Contract Length_cod']
+    target_variable = "Churn"
 
+    if upload_file is not None:
+        # Read the CSV file
+        df = pd.read_csv(upload_file)
+        df_copy = df.copy()
 
-elif seccion == 'Predicción':
-    st.write('Bienvenido a la sección de Predicción.')
+        # Load the model and make predictions:
+        if st.button("Load Model and Make Predictions"):
+            # Perform data scaling and encoding
+            df = scale_and_encode(df)
 
-    # Subir archivo CSV
-    subir_archivo = st.file_uploader("Cargar archivo CSV", type=["csv"])
+            X_test = df[feature_variables]
 
-    variables_features = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction', 'Gender_Male', 'Contract Length_cod']
-    variable_target = "Churn"
+            # Make predictions and get probabilities
+            prediction_results, probability_results, importance_results = load_and_predict_model(X_test)
 
-    if subir_archivo is not None:
-        # Leer el archivo CSV
-        df = pd.read_csv(subir_archivo)
-        df_1 = df.copy()
+            # Create a new DataFrame with predictions and probabilities
+            predictions_df = pd.DataFrame({'Predictions': prediction_results, 'Probability 0': probability_results[:, 0], 'Probability 1': probability_results[:, 1]})
 
-        # cargar el modelo y realizar predicciones:
-        if st.button("Cargar Modelo y Realizar Predicciones"):
-            # Ejecutar la función para escalar y codificar los datos
-            df = escalar_y_codificar(df)
+            # Concatenate the original DataFrame with the predictions DataFrame
+            result_df = pd.concat([df_copy, predictions_df], axis=1)
 
-            X_test = df[variables_features]
+            # Display the results
+            st.write("Prediction Results:")
+            st.write(result_df)
 
-            # Realizar predicciones y obtener probabilidades
-            resultados_predicción, probabilidades_predicción, importancia_predicciones = cargar_y_predecir_modelo(X_test)
-
-            # Crear un nuevo DataFrame con las predicciones y las probabilidades
-            df_predicciones = pd.DataFrame({'Predicciones': resultados_predicción, 'Probabilidad 0': probabilidades_predicción[:, 0], 'Probabilidad 1': probabilidades_predicción[:, 1]})
-
-            # Concatenar el DataFrame original con el DataFrame de predicciones
-            df_resultado = pd.concat([df_1, df_predicciones], axis=1)
-
-            # Mostrar los resultados
-            st.write("Resultados de Predicción:")
-            st.write(df_resultado)
-
-            # Crear un gráfico para mostrar las probabilidades
+            # Create a histogram to show probabilities
             import matplotlib.pyplot as plt
 
-            # Histograma de las probabilidades
-            st.subheader('Histograma de Probabilidades')
-            plt.hist(probabilidades_predicción[:, 1], bins=20, color='blue', alpha=0.7)
-            plt.xlabel('Probabilidad de Churn')
-            plt.ylabel('Frecuencia')
+            # Histogram of probabilities
+            st.subheader('Probability Histogram')
+            plt.hist(probability_results[:, 1], bins=20, color='blue', alpha=0.7)
+            plt.xlabel('Churn Probability')
+            plt.ylabel('Frequency')
             st.pyplot(plt)
 
-            # Crear un DataFrame con las características y sus importancias
-            feature_importancias = pd.DataFrame({'Feature': variables_features, 'Importancia': importancia_predicciones})
-            feature_importancias = feature_importancias.sort_values(by='Importancia', ascending=False)
+            # Create a DataFrame with features and their importances
+            feature_importance = pd.DataFrame({'Feature': feature_variables, 'Importance': importance_results})
+            feature_importance = feature_importance.sort_values(by='Importance', ascending=False)
 
-            # Graficar las importancias
+            # Plot importances
             plt.figure(figsize=(10, 6))
-            sns.barplot(x='Importancia', y='Feature', data=feature_importancias)
-            plt.title('Importancia de Características')
-            plt.xlabel('Importancia')
-            plt.ylabel('Característica')
+            sns.barplot(x='Importance', y='Feature', data=feature_importance)
+            plt.title('Feature Importance')
+            plt.xlabel('Importance')
+            plt.ylabel('Feature')
 
-            # Mostrar la gráfica de importancias
-            st.subheader('Importancia de Características')
+            # Display the feature importance plot
+            st.subheader('Feature Importance')
             st.pyplot(plt)
 
-            # Agregar espacios
+            # Add space
             st.markdown('<br>', unsafe_allow_html=True)
 
             st.write(
@@ -380,39 +316,23 @@ elif seccion == 'Predicción':
                 unsafe_allow_html=True
             )
 
-            # Agregar espacios
+            # Add space
             st.markdown('<br>', unsafe_allow_html=True)
 
-elif seccion == 'Conclusiones y Recomendaciones':
-    st.title('Conclusiones y Recomendaciones')
+elif section == 'Conclusions and Recommendations':
+    st.title('Conclusions and Recommendations')
 
-    # conclusiones y recomendaciones
+    # Conclusions and recommendations
 
-    st.write('El modelo creado tiene una efectividad del 70%, por lo que se solicita a la empresa más información'
+    st.write('The created model has an accuracy of 70%, so we request more information from the company '
+             '(additional variables and data) to attempt to improve the model and its predictions.')
 
-        '(variables y datos adicionales) para intentar mejorar el modelo y sus predicciones.')
+    st.write('The variables that most affect customer churn are support calls, '
+             'suggesting a need to pay attention to the quality of service provided by the company to prevent customer churn. '
+             'Customers making more calls likely have unresolved issues.')
 
-    st.write('Las variables que más afectan a la pérdida de clientes son el soporte de llamadas,' 
+    st.write('Additionally, it was observed that monthly contracts have a high average churn rate. '
+             'It is recommended to explore strategies to retain these customers, such as offering longer-term contracts.')
 
-        'lo que sugiere prestar atención a la calidad del servicio proporcionado por la empresa' 
-
-        'para evitar la fuga de clientes. Aquellos clientes que realizan más llamadas probablemente' 
-
-        'tengan problemas no resueltos.')
-
-    st.write('Además, se observó que los contratos mensuales tienen un alto promedio de deserción de la empresa.'
-
-        'Se recomienda explorar estrategias para retener a estos clientes, como la oferta de contratos a más'
-
-        'largo plazo.')
-
-    st.write('Se sugiere la generación de una campaña de retención utilizando el análisis predictivo para' 
-
-        'evaluar su eficacia. Mientras tanto, se espera obtener nuevos datos para mejorar el modelo y,' 
-
-        'por ende, las predicciones.')
-    
-
-    
-
-
+    st.write('We suggest generating a retention campaign using predictive analysis to evaluate its effectiveness. '
+             'In the meantime, we look forward to obtaining new data to improve the model and, therefore, the predictions.')
