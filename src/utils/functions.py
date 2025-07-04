@@ -1,103 +1,131 @@
 
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import streamlit as st
+import joblib
+import os
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    classification_report, confusion_matrix, roc_curve, auc
+    confusion_matrix, roc_curve, auc
 )
-from sklearn.preprocessing import MinMaxScaler
-import joblib
 
+# --- INICIO: Lógica de Rutas para cargar el modelo ---
+# Obtener la ruta del directorio 'utils' donde se encuentra este archivo
+UTILS_DIR = os.path.dirname(os.path.abspath(__file__))
+# Subir dos niveles para llegar a la raíz del proyecto (desde 'utils' a 'src', y de 'src' a la raíz)
+PROJECT_ROOT = os.path.abspath(os.path.join(UTILS_DIR, os.pardir, os.pardir))
+# --- FIN: Lógica de Rutas ---
 
-
-
-def load_and_preprocess_data(train_csv, test_csv):
+def cargar_y_preprocesar_datos(ruta_train_csv, ruta_test_csv):
     """
-    Load and preprocess customer churn data from CSV files.
+    Carga y preprocesa los datos de churn de clientes desde archivos CSV.
 
     Args:
-        train_csv (str): File path to the training dataset.
-        test_csv (str): File path to the testing dataset.
+        ruta_train_csv (str): Ruta al archivo del conjunto de datos de entrenamiento.
+        ruta_test_csv (str): Ruta al archivo del conjunto de datos de prueba.
 
     Returns:
-        df_concatenated (pd.DataFrame): Concatenated and preprocessed data.
-        customer_ids (pd.Series): Customer IDs.
+        df_concatenado (pd.DataFrame): Datos concatenados y preprocesados.
+        ids_clientes (pd.Series): IDs de los clientes.
     """
-    # Load data from CSV files
-    df_train = pd.read_csv(train_csv)
-    df_test = pd.read_csv(test_csv)
+    df_train = pd.read_csv(ruta_train_csv)
+    df_test = pd.read_csv(ruta_test_csv)
 
-    # Remove rows with all missing values
     df_train = df_train.dropna(how='all')
 
-    # Add a 'dataset' column to distinguish between training and testing sets
     df_train['dataset'] = 'train'
     df_test['dataset'] = 'test'
 
-    # Concatenate training and testing sets
-    df_concatenated = pd.concat([df_train, df_test], ignore_index=True)
+    df_concatenado = pd.concat([df_train, df_test], ignore_index=True)
 
-    # Save the "CustomerID" column in a variable and remove it from the DataFrame
-    customer_ids = df_concatenated["CustomerID"]
-    df_concatenated = df_concatenated.drop("CustomerID", axis=1)
+    ids_clientes = df_concatenado["CustomerID"]
+    df_concatenado = df_concatenado.drop("CustomerID", axis=1)
 
-    return df_concatenated, customer_ids
+    return df_concatenado, ids_clientes
 
-def scale_and_encode(df):
+def escalar_y_codificar(df):
     """
-    Scale and encode categorical variables in the DataFrame.
+    Escala y codifica variables categóricas en el DataFrame.
 
     Args:
-        df (pd.DataFrame): Input DataFrame.
+        df (pd.DataFrame): DataFrame de entrada.
 
     Returns:
-        df (pd.DataFrame): DataFrame with scaled and encoded variables.
+        df (pd.DataFrame): DataFrame con variables escaladas y codificadas.
     """
-    # Encode Gender and Subscription Type as binary columns
-    dummies = pd.get_dummies(df[['Gender', 'Subscription Type']], drop_first=True)
-    dummies = dummies.astype(int)  # Convert binary columns to integers (0 and 1)
-    df = pd.concat([df, dummies], axis=1)
-    df = df.drop(['Gender', 'Subscription Type'], axis=1)
+    # Crear una copia para evitar modificar el DataFrame original que se muestra en la app
+    df_procesado = df.copy()
 
-    # Encode the Contract Length variable
-    df['Contract Length_cod'] = df['Contract Length'].apply(lambda x: 1 if x in ('Annual', 'Quarterly') else 0)
+    # Codificar Gender y Subscription Type como columnas binarias
+    dummies = pd.get_dummies(df_procesado[['Gender', 'Subscription Type']], drop_first=True)
+    dummies = dummies.astype(int)
+    df_procesado = pd.concat([df_procesado, dummies], axis=1)
+    df_procesado = df_procesado.drop(['Gender', 'Subscription Type'], axis=1)
 
-    # Select numeric columns for scaling
-    variables_to_scale = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
+    # Codificar la variable Contract Length
+    df_procesado['Contract Length_cod'] = df_procesado['Contract Length'].apply(lambda x: 1 if x in ('Annual', 'Quarterly') else 0)
 
-    # Create a MinMaxScaler object
+    # Seleccionar columnas numéricas para escalar
+    variables_a_escalar = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction']
+
+    # Crear un objeto MinMaxScaler
     scaler = MinMaxScaler()
 
-    # Apply scaling to the selected numeric columns
-    df[variables_to_scale] = scaler.fit_transform(df[variables_to_scale])
+    # Aplicar escalado a las columnas numéricas seleccionadas
+    df_procesado[variables_a_escalar] = scaler.fit_transform(df_procesado[variables_a_escalar])
 
-    return df
+    return df_procesado
 
-
-
-
-def prepare_data(df):
+def cargar_y_predecir_modelo(nuevos_datos):
     """
-    Prepare data for training and testing.
+    Carga un modelo pre-entrenado y realiza predicciones sobre nuevos datos.
 
     Args:
-        df (pd.DataFrame): Preprocessed DataFrame.
+        nuevos_datos (pd.DataFrame): Nuevos datos para la predicción.
 
     Returns:
-        X_train, y_train, X_test, y_test: Training and testing data splits.
+        predicciones (array): Clases predichas (0 o 1).
+        probabilidades (array): Probabilidades predichas para cada clase.
+        importancias (array): Coeficientes del modelo.
     """
-    # Filter the DataFrame to obtain training and testing sets
+    # Construir la ruta al modelo de forma robusta
+    ruta_modelo_pkl = os.path.join(PROJECT_ROOT, 'src', 'models', 'modelo_lr_mejor.pkl')
+
+    # Cargar el modelo pre-entrenado desde el archivo .pkl
+    modelo = joblib.load(ruta_modelo_pkl)
+
+    # Realizar predicciones sobre los nuevos datos
+    predicciones = modelo.predict(nuevos_datos)
+
+    # Obtener las probabilidades predichas (0 y 1)
+    probabilidades = modelo.predict_proba(nuevos_datos)
+
+    # Obtener la importancia de las características (coeficientes)
+    importancias = modelo.coef_[0]
+
+    # Devolver predicciones, probabilidades e importancias
+    return predicciones, probabilidades, importancias
+
+
+# --- Funciones de Ayuda para Entrenamiento y Evaluación (usadas en el notebook) ---
+
+def preparar_datos(df):
+    """
+    Prepara los datos para el entrenamiento y la prueba.
+
+    Args:
+        df (pd.DataFrame): DataFrame preprocesado.
+
+    Returns:
+        X_train, y_train, X_test, y_test: Divisiones de datos de entrenamiento y prueba.
+    """
     train_data = df[df["dataset"] == "train"]
     test_data = df[df["dataset"] == "test"]
 
-    # Define feature variables and target variable
     variables_features = ['Age', 'Support Calls', 'Payment Delay', 'Total Spend', 'Last Interaction', 'Gender_Male', 'Contract Length_cod']
     variable_target = "Churn"
 
-    # Select feature and target variables for training and testing
     X_train = train_data[variables_features]
     y_train = train_data[variable_target]
     X_test = test_data[variables_features]
@@ -105,82 +133,38 @@ def prepare_data(df):
 
     return X_train, y_train, X_test, y_test
 
-def load_and_predict_model(new_data):
-    """
-    Load a pre-trained model and make predictions on new data.
-
-    Args:
-        new_data (pd.DataFrame): New data for prediction.
-
-    Returns:
-        predictions (array): Predicted classes (0 or 1).
-        probabilities (array): Predicted probabilities for each class.
-        importances (array): Coefficients of the model.
-    """
-    model_pkl = "src/models/modelo_lr_mejor.pkl"
-
-    # Load the pre-trained model from the .pkl file
-    model = joblib.load(model_pkl)
-
-    # Make predictions on the new data
-    predictions = model.predict(new_data)
-
-    # Get predicted probabilities (0 and 1)
-    probabilities = model.predict_proba(new_data)
-
-    # Get feature importances (coefficients)
-    importances = model.coef_[0]
-
-    # Return predictions, probabilities, and importances
-    return predictions, probabilities, importances
-
-
-
-
-def plot_confusion_matrix(y_test, y_pred, title="Confusion Matrix"):
-    cm = confusion_matrix(y_test, y_pred)
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.title(title)
-    plt.show()
-
-
-def evaluate_classifier(model, X_train, y_train, X_test, y_test):
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
+def evaluar_clasificador(modelo, X_train, y_train, X_test, y_test):
+    """Evalúa un clasificador y devuelve sus métricas."""
+    modelo.fit(X_train, y_train)
+    y_pred = modelo.predict(X_test)
     return {
-        "Accuracy": accuracy,
-        "Precision": precision,
-        "Recall": recall,
-        "F1 Score": f1
+        "Accuracy": accuracy_score(y_test, y_pred),
+        "Precision": precision_score(y_test, y_pred),
+        "Recall": recall_score(y_test, y_pred),
+        "F1 Score": f1_score(y_test, y_pred)
     }
 
-
-def plot_confusion_matrix(y_test, y_pred, title="Confusion Matrix"):
+def graficar_matriz_confusion(y_test, y_pred, title="Matriz de Confusión"):
+    """Grafica la matriz de confusión."""
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
+    plt.xlabel('Predicho')
+    plt.ylabel('Verdadero')
     plt.title(title)
-    plt.show()
+    st.pyplot(plt) # Usar st.pyplot para mostrar en Streamlit si es necesario
 
-def plot_roc_curve(y_test, y_probs, model_name):
+def graficar_curva_roc(y_test, y_probs, nombre_modelo):
+    """Grafica la curva ROC."""
     fpr, tpr, thresholds = roc_curve(y_test, y_probs)
     roc_auc = auc(fpr, tpr)
     plt.figure(figsize=(8, 6))
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC Curve (AUC = {roc_auc:.2f})')
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'Curva ROC (AUC = {roc_auc:.2f})')
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title(f'ROC Curve for {model_name}')
+    plt.xlabel('Tasa de Falsos Positivos')
+    plt.ylabel('Tasa de Verdaderos Positivos')
+    plt.title(f'Curva ROC para {nombre_modelo}')
     plt.legend(loc='lower right')
-    plt.show()
+    st.pyplot(plt) # Usar st.pyplot para mostrar en Streamlit si es necesario
